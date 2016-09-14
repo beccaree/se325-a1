@@ -2,6 +2,8 @@ package nz.ac.auckland.library.services;
 
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,10 +29,42 @@ public class LibraryResource {
 	
 	public LibraryResource() {}
 	
+//	@GET
+//	public MyEntity myServiceMethod( ) {
+//		EntityManager entityMgr = PersistenceManager.instance( ).createEntityManager( );         
+//		try {             
+//			entityMgr.getTransaction( ).begin( );
+//			// Do useful work.
+//			entityMgr.getTransaction( ).commit( );         
+//		} catch( Exception e ) {
+//			// Handle/propagate any exceptions.
+//	       	} finally {             
+//	       	if( entityMgr != null && entityMgr.isOpen( ) ) {                
+//	       		entityMgr.close( );             
+//	       	}         
+//	    }     
+//	}
+	
+	
 	@POST
 	@Consumes("application/xml")
 	public Response createBook(Book book) {
-		//_logger.debug("Read book: " + dtoParolee);
+		EntityManager entityMgr = PersistenceManager.instance().createEntityManager();
+		
+		try {
+			EntityTransaction tx = entityMgr.getTransaction();
+			tx.begin();
+			//_logger.debug("Read book: " + dtoParolee);
+			// Do stuff			
+			
+			tx.commit();
+		} catch (Exception e) {
+			
+		} finally {
+			if (entityMgr != null && entityMgr.isOpen()) {
+				entityMgr.close();
+			}
+		}
 		return null;
 		
 	}
