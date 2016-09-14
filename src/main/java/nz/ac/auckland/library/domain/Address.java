@@ -26,7 +26,15 @@ public class Address {
 	
 	@XmlElement(name="zip_code")
 	private String _zipCode;
-
+	
+	public Address(String number, String street, String suburb, String city, String zipCode) {
+		_streetNumber = number;
+		_streetName = street;
+		_suburb = suburb;
+		_city = city;
+		_zipCode = zipCode;
+	}
+	
 	public String getStreetNumber() {
 		return _streetNumber;
 	}

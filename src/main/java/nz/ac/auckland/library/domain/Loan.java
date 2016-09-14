@@ -23,6 +23,12 @@ public class Loan {
 	
 	@XmlElement(name="return_date")
 	private LocalDate _returnDate;
+	
+	public Loan(Member borrower, LocalDate start, LocalDate end) {
+		_borrower = borrower;
+		_loanDate = start;
+		_returnDate = end;
+	}
 
 	public Member getBorrower() {
 		return _borrower;

@@ -1,7 +1,11 @@
 package nz.ac.auckland.library.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,7 +21,7 @@ import nz.ac.auckland.library.jaxb.LocalDateAdapter;
  * Class to represent a Book in the library, a book has the following fields:
  * 
  * - Details: title, subtitle, author, book type, date published, genre;
- * - isAvailable: if the book is currently available;
+ * - Availablility: if the book is currently available, and if not who it is held by;
  * - loanHistory: the book's history of loans;
  * 
  * A Book is uniquely identified by an id value of type Long.
@@ -25,10 +29,13 @@ import nz.ac.auckland.library.jaxb.LocalDateAdapter;
  * @author Rebecca Lee (rlee291)
  *
  */
+@Entity
 @XmlRootElement(name="book")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Book {
 	
+	@Id
+	@GeneratedValue
 	@XmlAttribute(name="id")
 	private long _id;
 	
@@ -51,12 +58,22 @@ public class Book {
 	@XmlJavaTypeAdapter(value=LocalDateAdapter.class)
 	private LocalDate _datePublished;
 	
-	@XmlElement(name="is_available")
-	private Boolean _isAvailable;
+	@XmlElement(name="availability")
+	private Availability _availablility = new Availability();
 	
 	@XmlElement(name="loan_history")
-	private List<Loan> _loanHistory;
+	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
+	public Book(String title, Person author, BookGenre genre, Publisher publisher, LocalDate datePublished) {
+		_title = title;
+		_author = author;
+		_genre = genre;
+		_publisher = publisher;
+		_datePublished = datePublished;
+	}
+	
+	public Book() {}
+
 	public long getId() {
 		return _id;
 	}
@@ -70,7 +87,7 @@ public class Book {
 	}
 
 	public void setSubtitle(String subtitle) {
-		this._subtitle = subtitle;
+		_subtitle = subtitle;
 	}
 
 	public Person getAuthor() {
@@ -78,7 +95,7 @@ public class Book {
 	}
 
 	public void setAuthor(Person author) {
-		this._author = author;
+		_author = author;
 	}
 
 	public BookGenre getGenre() {
@@ -86,7 +103,7 @@ public class Book {
 	}
 
 	public void setGenre(BookGenre genre) {
-		this._genre = genre;
+		_genre = genre;
 	}
 
 	public Publisher getPublisher() {
@@ -94,7 +111,7 @@ public class Book {
 	}
 
 	public void setPublisher(Publisher publisher) {
-		this._publisher = publisher;
+		_publisher = publisher;
 	}
 
 	public LocalDate getDatePublished() {
@@ -102,23 +119,23 @@ public class Book {
 	}
 
 	public void setDatePublished(LocalDate datePublished) {
-		this._datePublished = datePublished;
+		_datePublished = datePublished;
 	}
 
-	public Boolean getIsAvailable() {
-		return _isAvailable;
+	public Availability getAvailablility() {
+		return _availablility;
 	}
 
-	public void setIsAvailable(Boolean isAvailable) {
-		this._isAvailable = isAvailable;
+	public void setAvailablility(Boolean isAvailable) {
+		_availablility.setAvailable(isAvailable);
 	}
 
 	public List<Loan> getLoanHistory() {
 		return _loanHistory;
 	}
 
-	public void setLoanHistory(List<Loan> loanHistory) {
-		this._loanHistory = loanHistory;
+	public void addToLoanHistory(Loan loan) {
+		_loanHistory.add(loan);
 	}
 
 }

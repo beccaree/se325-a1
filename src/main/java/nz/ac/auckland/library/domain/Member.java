@@ -34,7 +34,9 @@ public class Member extends Person {
 		this(username, null, null);
 	}
 	
-	protected Member() {}
+	protected Member() {
+		super();
+	}
 	
 	public String getUsername() {
 		return _username;
