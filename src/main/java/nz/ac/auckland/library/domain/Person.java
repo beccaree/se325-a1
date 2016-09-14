@@ -30,9 +30,6 @@ public class Person {
 	@XmlElement(name="last_name")
 	private String _lastname;
 	
-	@XmlElement(name="date_of_birth")
-	private LocalDate _dateOfBirth;
-	
 	public Person(String firstname, String lastname) {
 		_firstname = firstname;
 		_lastname = lastname;
@@ -40,20 +37,16 @@ public class Person {
 	
 	public Person() {}
 
-	public String getLastname() {
-		return _lastname;
+	public Long getId() {
+		return _id;
 	}
-		
+	
 	public String getFirstname() {
 		return _firstname;
 	}
 	
-	public LocalDate getDateOfBirth() {
-		return _dateOfBirth;
-	}
-
-	public void setDateOfBirth(LocalDate date) {
-		this._dateOfBirth = date;
+	public String getLastname() {
+		return _lastname;
 	}
 	
 }

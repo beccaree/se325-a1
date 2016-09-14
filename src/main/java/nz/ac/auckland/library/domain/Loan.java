@@ -1,11 +1,17 @@
 package nz.ac.auckland.library.domain;
 
 import javax.xml.bind.annotation.XmlAccessType;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.joda.time.LocalDate;
-
+/**
+ * Class to represent a Loan made by a Library member
+ * 
+ * @author Rebecca Lee (rlee291)
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Loan {
 	
@@ -17,5 +23,29 @@ public class Loan {
 	
 	@XmlElement(name="return_date")
 	private LocalDate _returnDate;
+
+	public Member getBorrower() {
+		return _borrower;
+	}
+
+	public void setBorrower(Member borrower) {
+		this._borrower = borrower;
+	}
+
+	public LocalDate getLoanDate() {
+		return _loanDate;
+	}
+
+	public void setLoanDate(LocalDate loanDate) {
+		this._loanDate = loanDate;
+	}
+
+	public LocalDate getReturnDate() {
+		return _returnDate;
+	}
+
+	public void setReturnDate(LocalDate returnDate) {
+		this._returnDate = returnDate;
+	}
 	
 }

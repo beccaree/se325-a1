@@ -18,5 +18,21 @@ public class Publisher {
 	
 	@XmlElement(name="address")
 	private Address _address;
+	
+	public String getName() {
+		return _name;
+	}
+
+	public void setName(String name) {
+		this._name = name;
+	}
+
+	public Address getAddress() {
+		return _address;
+	}
+
+	public void setAddress(Address address) {
+		this._address = address;
+	}	
 
 }

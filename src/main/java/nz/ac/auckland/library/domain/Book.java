@@ -52,9 +52,73 @@ public class Book {
 	private LocalDate _datePublished;
 	
 	@XmlElement(name="is_available")
-	private Boolean isAvailable;
+	private Boolean _isAvailable;
 	
 	@XmlElement(name="loan_history")
-	private List<Loan> loanHistory;
+	private List<Loan> _loanHistory;
+	
+	public long getId() {
+		return _id;
+	}
+
+	public String getTitle() {
+		return _title;
+	}
+
+	public String getSubtitle() {
+		return _subtitle;
+	}
+
+	public void setSubtitle(String subtitle) {
+		this._subtitle = subtitle;
+	}
+
+	public Person getAuthor() {
+		return _author;
+	}
+
+	public void setAuthor(Person author) {
+		this._author = author;
+	}
+
+	public BookGenre getGenre() {
+		return _genre;
+	}
+
+	public void setGenre(BookGenre genre) {
+		this._genre = genre;
+	}
+
+	public Publisher getPublisher() {
+		return _publisher;
+	}
+
+	public void setPublisher(Publisher publisher) {
+		this._publisher = publisher;
+	}
+
+	public LocalDate getDatePublished() {
+		return _datePublished;
+	}
+
+	public void setDatePublished(LocalDate datePublished) {
+		this._datePublished = datePublished;
+	}
+
+	public Boolean getIsAvailable() {
+		return _isAvailable;
+	}
+
+	public void setIsAvailable(Boolean isAvailable) {
+		this._isAvailable = isAvailable;
+	}
+
+	public List<Loan> getLoanHistory() {
+		return _loanHistory;
+	}
+
+	public void setLoanHistory(List<Loan> loanHistory) {
+		this._loanHistory = loanHistory;
+	}
 
 }

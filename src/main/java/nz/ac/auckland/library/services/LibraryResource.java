@@ -45,7 +45,6 @@ public class LibraryResource {
 //	    }     
 //	}
 	
-	
 	@POST
 	@Consumes("application/xml")
 	public Response createBook(Book book) {
