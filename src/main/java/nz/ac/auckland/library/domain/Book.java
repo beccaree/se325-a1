@@ -52,7 +52,7 @@ public class Book {
 	private BookGenre _genre;
 	
 	@XmlElement(name="publisher")
-	private Publisher _publisher;
+	private String _publisher;
 	
 	@XmlElement(name="date_published")
 	@XmlJavaTypeAdapter(value=LocalDateAdapter.class)
@@ -64,7 +64,7 @@ public class Book {
 	@XmlElement(name="loan_history")
 	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
-	public Book(String title, Person author, BookGenre genre, Publisher publisher, LocalDate datePublished) {
+	public Book(String title, Person author, BookGenre genre, String publisher, LocalDate datePublished) {
 		_title = title;
 		_author = author;
 		_genre = genre;
@@ -106,11 +106,11 @@ public class Book {
 		_genre = genre;
 	}
 
-	public Publisher getPublisher() {
+	public String getPublisher() {
 		return _publisher;
 	}
 
-	public void setPublisher(Publisher publisher) {
+	public void setPublisher(String publisher) {
 		_publisher = publisher;
 	}
 
