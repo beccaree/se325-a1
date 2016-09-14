@@ -1,5 +1,8 @@
 package nz.ac.auckland.library.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -12,9 +15,12 @@ import org.joda.time.LocalDate;
  * @author Rebecca Lee (rlee291)
  *
  */
+@Entity
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Person {
 
+	@Id
+	@GeneratedValue
 	@XmlAttribute(name="id")
 	private long _id;
 	
@@ -26,5 +32,28 @@ public class Person {
 	
 	@XmlElement(name="date_of_birth")
 	private LocalDate _dateOfBirth;
+	
+	public Person(String firstname, String lastname) {
+		_firstname = firstname;
+		_lastname = lastname;
+	}
+	
+	public Person() {}
+
+	public String getLastname() {
+		return _lastname;
+	}
+		
+	public String getFirstname() {
+		return _firstname;
+	}
+	
+	public LocalDate getDateOfBirth() {
+		return _dateOfBirth;
+	}
+
+	public void setDateOfBirth(LocalDate date) {
+		this._dateOfBirth = date;
+	}
 	
 }
