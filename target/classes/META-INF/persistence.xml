@@ -23,7 +23,7 @@
 	<persistence-unit name="PersistenceUnit">
 		<!--  Classes which are to be mapped and therefore persistent. -->
 		<class>nz.ac.auckland.domain.Book</class>
-		<class>nz.ac.auckland.audit.AuditEntry</class>
+		<class>nz.ac.auckland.domain.Person</class>
 
 		<properties>
 			<!--  Configure the data source. In this case the embedded H2 database
