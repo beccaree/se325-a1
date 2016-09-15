@@ -15,7 +15,7 @@ import org.joda.time.LocalDate;
  * @author Rebecca Lee (rlee291)
  *
  */
-@Entity
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Person {
 

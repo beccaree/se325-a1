@@ -3,8 +3,10 @@ package nz.ac.auckland.library.domain;
 import javax.persistence.Entity;
 
 /**
+ * Class to represent a request made by a Member of the library
+ * represented by member, book title and author
  * 
- * @author user
+ * @author Rebecca Lee (rlee291)
  *
  */
 @Entity

@@ -30,42 +30,23 @@ import nz.ac.auckland.library.jaxb.LocalDateAdapter;
  *
  */
 @Entity
-@XmlRootElement(name="book")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Book {
 	
 	@Id
 	@GeneratedValue
-	@XmlAttribute(name="id")
 	private long _id;
-	
-	@XmlElement(name="title")
 	private String _title;
-	
-	@XmlElement(name="subtitle")
 	private String _subtitle;
-	
-	@XmlElement(name="author")
 	private Person _author;
-	
-	@XmlElement(name="genre")
 	private BookGenre _genre;
-	
-	@XmlElement(name="publisher")
 	private String _publisher;
-	
-	@XmlElement(name="date_published")
-	@XmlJavaTypeAdapter(value=LocalDateAdapter.class)
 	private LocalDate _datePublished;
-	
-	@XmlElement(name="availability")
 	private Availability _availablility = new Availability();
-	
-	@XmlElement(name="loan_history")
 	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
-	public Book(String title, Person author, BookGenre genre, String publisher, LocalDate datePublished) {
+	public Book(String title, String subtitle, Person author, BookGenre genre, String publisher, LocalDate datePublished) {
 		_title = title;
+		_subtitle = subtitle;
 		_author = author;
 		_genre = genre;
 		_publisher = publisher;
