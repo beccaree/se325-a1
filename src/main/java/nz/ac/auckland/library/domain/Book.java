@@ -7,11 +7,8 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
 import org.joda.time.LocalDate;
 
 /**
@@ -45,7 +42,8 @@ public class Book {
 	@ElementCollection
 	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
-	public Book(String title, String subtitle, Author author, BookGenre genre, String publisher, LocalDate datePublished) {
+	public Book(long id, String title, String subtitle, Author author, BookGenre genre, String publisher, LocalDate datePublished) {
+		_id = id;
 		_title = title;
 		_subtitle = subtitle;
 		_author = author;

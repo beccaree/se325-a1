@@ -10,6 +10,7 @@ import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * Class represents a person who is a member of the library web service
@@ -26,7 +27,7 @@ public class Member extends Person {
 	
 	@OneToMany(mappedBy="request", 
 			fetch=FetchType.LAZY)
-	@XmlElement(name="currently_held_books")
+	@XmlElement(name="current_books")
 	private Set<Book> currentBooks = new HashSet<Book>();
 
 	public Member(String username, String firstname, String lastname) {
