@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -22,6 +24,8 @@ public class Member extends Person {
 	@Column(unique=true)
 	private String _username;
 	
+	@OneToMany(mappedBy="request", 
+			fetch=FetchType.LAZY)
 	@XmlElement(name="currently_held_books")
 	private Set<Book> currentBooks = new HashSet<Book>();
 

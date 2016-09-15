@@ -1,5 +1,6 @@
 package nz.ac.auckland.library.domain;
 
+import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -7,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
  * @author Rebecca Lee (rlee291)
  *
  */
+@Embeddable
 public class Availability {
 
 	@XmlElement(name="is_available")

@@ -1,5 +1,6 @@
 package nz.ac.auckland.library.domain;
 
+import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlAccessType;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -12,6 +13,7 @@ import org.joda.time.LocalDate;
  * @author Rebecca Lee (rlee291)
  *
  */
+@Embeddable
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Loan {
 	

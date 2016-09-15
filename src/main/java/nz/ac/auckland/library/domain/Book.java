@@ -3,19 +3,16 @@ package nz.ac.auckland.library.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.persistence.OneToMany;
 
 import org.joda.time.LocalDate;
-
-import nz.ac.auckland.library.jaxb.LocalDateAdapter;
 
 /**
  * Class to represent a Book in the library, a book has the following fields:
@@ -37,14 +34,18 @@ public class Book {
 	private long _id;
 	private String _title;
 	private String _subtitle;
-	private Person _author;
+	private Author _author;
+	
+	@Enumerated(EnumType.STRING)
 	private BookGenre _genre;
 	private String _publisher;
 	private LocalDate _datePublished;
 	private Availability _availablility = new Availability();
+	
+	@ElementCollection
 	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
-	public Book(String title, String subtitle, Person author, BookGenre genre, String publisher, LocalDate datePublished) {
+	public Book(String title, String subtitle, Author author, BookGenre genre, String publisher, LocalDate datePublished) {
 		_title = title;
 		_subtitle = subtitle;
 		_author = author;
@@ -71,11 +72,11 @@ public class Book {
 		_subtitle = subtitle;
 	}
 
-	public Person getAuthor() {
+	public Author getAuthor() {
 		return _author;
 	}
 
-	public void setAuthor(Person author) {
+	public void setAuthor(Author author) {
 		_author = author;
 	}
 
