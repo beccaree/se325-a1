@@ -16,9 +16,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nz.ac.auckland.library.domain.Author;
 import nz.ac.auckland.library.domain.Book;
 import nz.ac.auckland.library.domain.BookGenre;
-import nz.ac.auckland.library.domain.Person;
 
 public class LibraryWebServiceTest {
 	private static final String WEB_SERVICE_URI = "http://localhost:10000/services/books";
@@ -62,8 +62,8 @@ public class LibraryWebServiceTest {
 	 */
 	@Test
 	public void addBook() {
-		Person author = new Person("J.K.", "Rowling");
-		Book hp = new Book("Harry Potter and the Philosopher's stone", author, BookGenre.FICTION, null, new LocalDate(1997, 6, 26));
+		Author author = new Author("J.K.", "Rowling");
+		Book hp = new Book("Harry Potter and the Philosopher's stone", null, author, BookGenre.FICTION, null, new LocalDate(1997, 6, 26));
 		
 		Response response = _client
 				.target(WEB_SERVICE_URI).request()
@@ -83,6 +83,7 @@ public class LibraryWebServiceTest {
 		assertEquals(hp.getTitle(), hpFromLibrary.getTitle());
 		assertEquals(hp.getSubtitle(), hpFromLibrary.getSubtitle());
 		assertEquals(hp.getAuthor().getFirstname(), hpFromLibrary.getAuthor().getFirstname());
+		assertEquals(hp.getAuthor().getLastname(), hpFromLibrary.getAuthor().getLastname());
 		assertEquals(hp.getDatePublished(), hpFromLibrary.getDatePublished());
 		assertEquals(hp.getGenre(), hpFromLibrary.getGenre());
 		assertEquals(hp.getPublisher(), hpFromLibrary.getPublisher()); // should be null
