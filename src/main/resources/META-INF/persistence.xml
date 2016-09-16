@@ -20,10 +20,15 @@
 	     
 	     www.h2database.com -->
 	     
-	<persistence-unit name="PersistenceUnit">
+	<persistence-unit name="LibraryPU">
 		<!--  Classes which are to be mapped and therefore persistent. -->
+		<class>nz.ac.auckland.domain.Author</class>
+		<class>nz.ac.auckland.domain.Availability</class>
 		<class>nz.ac.auckland.domain.Book</class>
+		<class>nz.ac.auckland.domain.Loan</class>
+		<class>nz.ac.auckland.domain.Member</class>
 		<class>nz.ac.auckland.domain.Person</class>
+		<class>nz.ac.auckland.domain.Request</class>
 
 		<properties>
 			<!--  Configure the data source. In this case the embedded H2 database

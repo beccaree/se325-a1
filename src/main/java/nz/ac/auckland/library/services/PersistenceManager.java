@@ -20,7 +20,7 @@ public class PersistenceManager {
 	private EntityManagerFactory _entityManagerFactory;
 	
 	protected PersistenceManager() {
-		_entityManagerFactory = Persistence.createEntityManagerFactory("PersistenceUnit");
+		_entityManagerFactory = Persistence.createEntityManagerFactory("LibraryPU");
 	}
 	
 	public EntityManager createEntityManager() {
