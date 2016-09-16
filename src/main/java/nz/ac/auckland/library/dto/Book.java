@@ -1,22 +1,16 @@
 package nz.ac.auckland.library.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.joda.time.LocalDate;
 
 import nz.ac.auckland.library.domain.Author;
-import nz.ac.auckland.library.domain.Availability;
 import nz.ac.auckland.library.domain.BookGenre;
-import nz.ac.auckland.library.domain.Loan;
 import nz.ac.auckland.library.jaxb.LocalDateAdapter;
 
 /**

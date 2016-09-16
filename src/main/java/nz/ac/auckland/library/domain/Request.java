@@ -21,8 +21,8 @@ public class Request {
 	@XmlAttribute(name="id")
 	private Long _id;
 	
-	@XmlElement(name="made_by")
-	private Member _madeBy;
+	@XmlElement(name="member_id")
+	private long _memberId;
 	
 	@XmlElement(name="book_title")
 	private String _bookTitle;
@@ -33,8 +33,8 @@ public class Request {
 	@XmlElement(name="author_last")
 	private String _authorLast;
 	
-	public Request(Member member, String title, String firstname, String lastname) {
-		_madeBy = member;
+	public Request(long memberId, String title, String firstname, String lastname) {
+		_memberId = memberId;
 		_bookTitle = title;
 		_authorFirst = firstname;
 		_authorLast = lastname;
@@ -44,8 +44,8 @@ public class Request {
 		return _id;
 	}
 	
-	public Member getRequestBy() {
-		return _madeBy;
+	public long getRequesterId() {
+		return _memberId;
 	}
 	
 	public String getBookTitle() {

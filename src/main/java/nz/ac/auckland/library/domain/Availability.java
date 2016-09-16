@@ -1,6 +1,10 @@
 package nz.ac.auckland.library.domain;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToOne;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -15,6 +19,7 @@ public class Availability {
 	private Boolean _isAvailable = true;
 	
 	@XmlElement(name="holder")
+	@OneToOne(cascade=CascadeType.PERSIST)
 	private Member _holder;
 	
 	public Availability() {} // default is available, and no holder
@@ -27,7 +32,7 @@ public class Availability {
 		return _holder;
 	}
 	
-	public void setHolder(Member holder) {
-		_holder = holder;
+	public void setHolder(Member member) {
+		_holder = member;
 	}
 }

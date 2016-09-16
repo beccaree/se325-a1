@@ -3,18 +3,18 @@ package nz.ac.auckland.library.domain;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * Class represents a person who is a member of the library web service
- * Child class of Person with extra fields username and current books they hold
+ * Child class of Person with extra fields id and current books they hold
  * @author Rebecca Lee (rlee291)
  *
  */
@@ -22,17 +22,16 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Member extends Person {
 	
-	@Column(unique=true)
-	private String _username;
+	@Id
+	@GeneratedValue
+	private long _id;
 	
-	@OneToMany(mappedBy="request", 
-			fetch=FetchType.LAZY)
 	@XmlElement(name="current_books")
-	private Set<Book> currentBooks = new HashSet<Book>();
+	@OneToMany(fetch=FetchType.LAZY)
+	private Set<Book> _currentBooks = new HashSet<Book>();
 
 	public Member(String username, String firstname, String lastname) {
 		super(firstname, lastname);
-		_username = username;
 	}
 	
 	public Member(String username) {
@@ -43,16 +42,16 @@ public class Member extends Person {
 		super();
 	}
 	
-	public String getUsername() {
-		return _username;
+	public long getId() {
+		return _id;
 	}
 	
 	public Set<Book> getCurrentlyHeldBooks() {
-		return currentBooks;
+		return _currentBooks;
 	}
 
 	public void addToCurrentBooks(Book book) {
-		this.currentBooks.add(book);
+		this._currentBooks.add(book);
 	}
 
 }
