@@ -1,14 +1,17 @@
 package nz.ac.auckland.library.domain;
 
+import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.joda.time.LocalDate;
 /**
  * Class to represent a Loan made by a Library member
  * 
@@ -24,12 +27,14 @@ public class Loan {
 	private Member _borrower;
 	
 	@XmlElement(name="loan_date")
-	private LocalDate _loanDate;
+	@Temporal(TemporalType.DATE)
+	private Date _loanDate;
 	
 	@XmlElement(name="return_date")
-	private LocalDate _returnDate;
+	@Temporal(TemporalType.DATE)
+	private Date _returnDate;
 	
-	public Loan(Member borrower, LocalDate start, LocalDate end) {
+	public Loan(Member borrower, Date start, Date end) {
 		_borrower = borrower;
 		_loanDate = start;
 		_returnDate = end;
@@ -43,19 +48,19 @@ public class Loan {
 		this._borrower = borrower;
 	}
 
-	public LocalDate getLoanDate() {
+	public Date getLoanDate() {
 		return _loanDate;
 	}
 
-	public void setLoanDate(LocalDate loanDate) {
+	public void setLoanDate(Date loanDate) {
 		this._loanDate = loanDate;
 	}
 
-	public LocalDate getReturnDate() {
+	public Date getReturnDate() {
 		return _returnDate;
 	}
 
-	public void setReturnDate(LocalDate returnDate) {
+	public void setReturnDate(Date returnDate) {
 		this._returnDate = returnDate;
 	}
 	

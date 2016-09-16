@@ -1,6 +1,7 @@
 package nz.ac.auckland.library.domain;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.ElementCollection;
@@ -12,8 +13,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-import org.joda.time.LocalDate;
+import org.hibernate.annotations.Type;
 
 /**
  * Class to represent a Book in the library, a book has the following fields:
@@ -40,13 +43,15 @@ public class Book {
 	@Enumerated(EnumType.STRING)
 	private BookGenre _genre;
 	private String _publisher;
-	private LocalDate _datePublished;
+	
+	@Temporal(TemporalType.DATE)
+	private Date _datePublished;
 	private Availability _availablility = new Availability();
 	
 	@ElementCollection
 	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
-	public Book(long id, String title, String subtitle, Author author, BookGenre genre, String publisher, LocalDate datePublished) {
+	public Book(long id, String title, String subtitle, Author author, BookGenre genre, String publisher, Date datePublished) {
 		_id = id;
 		_title = title;
 		_subtitle = subtitle;
@@ -98,11 +103,11 @@ public class Book {
 		_publisher = publisher;
 	}
 
-	public LocalDate getDatePublished() {
+	public Date getDatePublished() {
 		return _datePublished;
 	}
 
-	public void setDatePublished(LocalDate datePublished) {
+	public void setDatePublished(Date datePublished) {
 		_datePublished = datePublished;
 	}
 

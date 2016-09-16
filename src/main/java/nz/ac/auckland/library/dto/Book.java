@@ -1,5 +1,7 @@
 package nz.ac.auckland.library.dto;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -7,11 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.joda.time.LocalDate;
-
 import nz.ac.auckland.library.domain.Author;
 import nz.ac.auckland.library.domain.BookGenre;
-import nz.ac.auckland.library.jaxb.LocalDateAdapter;
 
 /**
  * The data transfer object representation of a Book, see domain.Book for more info
@@ -41,8 +40,7 @@ public class Book {
 	private String _publisher;
 	
 	@XmlElement(name="date_published")
-	@XmlJavaTypeAdapter(value=LocalDateAdapter.class)
-	private LocalDate _datePublished;
+	private Date _datePublished;
 	
 //	@XmlElement(name="availability")
 //	private Availability _availablility = new Availability();
@@ -52,11 +50,11 @@ public class Book {
 	
 	protected Book() {}
 	
-	public Book(String title, String subtitle, Author author, BookGenre genre, String publisher, LocalDate datePublished) {
+	public Book(String title, String subtitle, Author author, BookGenre genre, String publisher, Date datePublished) {
 		 this(0, title, subtitle, author, genre, publisher, datePublished);
 	}
 	
-	public Book(long id, String title, String subtitle, Author author, BookGenre genre, String publisher, LocalDate datePublished) {
+	public Book(long id, String title, String subtitle, Author author, BookGenre genre, String publisher, Date datePublished) {
 		_id = id;
 		_title = title;
 		_subtitle = subtitle;
@@ -106,11 +104,11 @@ public class Book {
 		_publisher = publisher;
 	}
 
-	public LocalDate getDatePublished() {
+	public Date getDatePublished() {
 		return _datePublished;
 	}
 
-	public void setDatePublished(LocalDate datePublished) {
+	public void setDatePublished(Date datePublished) {
 		_datePublished = datePublished;
 	}
 
