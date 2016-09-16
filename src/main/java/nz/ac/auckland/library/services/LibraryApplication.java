@@ -23,8 +23,7 @@ public class LibraryApplication extends Application {
 	
 	public LibraryApplication() {
 		// Register the BlogResource singleton to handle HTTP requests.
-		LibraryResource resource = new LibraryResource();
-	    singletons.add(resource);
+	    singletons.add(new LibraryResource());
 	    singletons.add(PersistenceManager.instance());
 	      
 	    // Register the ContextResolver class for JAXB.

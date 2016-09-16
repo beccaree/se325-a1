@@ -30,12 +30,8 @@ public class Member extends Person {
 	@OneToMany(fetch=FetchType.LAZY)
 	private Set<Book> _currentBooks = new HashSet<Book>();
 
-	public Member(String username, String firstname, String lastname) {
+	public Member(String firstname, String lastname) {
 		super(firstname, lastname);
-	}
-	
-	public Member(String username) {
-		this(username, null, null);
 	}
 	
 	protected Member() {
