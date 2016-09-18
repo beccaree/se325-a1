@@ -1,16 +1,26 @@
 package nz.ac.auckland.library.services;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +144,82 @@ public class LibraryResource {
 	}
 	
 	/**
+	 * Returns a List of nz.ac.auckland.library.dto.Book objects, according to the 
+	 * query parameters in the URI
+	 * 
+	 */
+	@GET
+	@Produces("application/xml")
+	public Response getBooks(@DefaultValue("0") @QueryParam("mid")long mid, @DefaultValue("1") @QueryParam("start")int start, 
+			@DefaultValue("0") @QueryParam("size")int size, @Context UriInfo uriInfo) {
+		URI uri = uriInfo.getAbsolutePath();		
+		Link previous = null;
+		Link next = null;
+		
+		if(start > 1 && size != 0) { // if size is 0, retrieve everything
+			// there are previous Book - create a previous link
+			_logger.debug("Making PREV link");
+			previous = Link.fromUri(uri + "?mid={mid}start={start}&size={size}")
+					.rel("prev")
+					.build(start - 1, size);
+		}
+		
+		// retrieve the list of books
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		List<Book> books = new ArrayList<Book>();
+		try {
+			em.getTransaction().begin();
+			
+			if (mid == 0) { // query all books
+				_logger.debug("Querying all books");
+				books = em.createQuery("select b from Book b", Book.class).getResultList();
+			} else { // query member's current books
+				_logger.debug("Querying books held by member id: " + mid);
+				String query = "SELECT * FROM BOOK b, MEMBER_BOOK m "
+						+ "WHERE m.member__id = 3 AND m._currentbooks__id = b._id";
+				books = em.createQuery(query, Book.class).getResultList();
+			}
+	
+			em.getTransaction().commit();
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+		// trim list of books according to query parameters and convert to dto objects
+		List<nz.ac.auckland.library.dto.Book> dtoBooks = new ArrayList<nz.ac.auckland.library.dto.Book>();
+		int upperBound = 0;
+		if (size == 0) {
+			upperBound = books.size();
+		}else {
+			upperBound = start + size - 1;
+		}
+		for(int i = start-1; i < upperBound; i++) {
+			dtoBooks.add(BookMapper.toDto(books.get(i)));
+		}
+		
+		if(size != 0 && start + size <= books.size()) { // there are successive books - create a next link
+			_logger.info("Making NEXT link");
+			next = Link.fromUri(uri + "?start={start}&size={size}")
+					.rel("next")
+					.build(start + 1, size);
+		}
+		GenericEntity<List<nz.ac.auckland.library.dto.Book>> entity = 
+				new GenericEntity<List<nz.ac.auckland.library.dto.Book>>(dtoBooks) {};
+		
+		// build a response 
+		ResponseBuilder builder = Response.ok(entity);
+ 		if(previous != null) {
+ 			builder.links(previous);
+ 		}
+ 		if(next != null) {
+ 			builder.links(next);
+ 		}
+ 		return builder.build();
+	}
+	
+	/**
 	 * Returns the member with unique identifier id
 	 * @param id
 	 */
@@ -208,7 +294,7 @@ public class LibraryResource {
 			Book sj = new Book(0, "Steve Jobs", "", new Author("Walter", "Isaacson"), BookGenre.BIOGRAPHY, "Simon & Shuster (U.S.)", new Date(2011-1900, 10-1, 24));
 			// create a member
 			Member amy = new Member(0, "amy", "wright");
-			// issue Steve Jobs to Amy Wright
+			// issue a book to a member
 			sj.addLoan(new Loan(amy, new Date(2014-1900, 10-1, 1), null));
 			sj.setAvailability(new Availability(false, amy));
 			amy.addToCurrentBooks(sj);

@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.junit.AfterClass;
@@ -37,18 +39,6 @@ public class LibraryWebServiceTest {
 	public static void setUpClient() {
 		_client = ClientBuilder.newClient();
 	}
-
-	/**
-	 * Runs before each unit test to restore Web service database. This ensures
-	 * that each test is independent.
-	 */
-	@Before
-	public void reloadServerData() {
-		Response response = _client
-				.target(WEB_SERVICE_URI).request()
-				.put(null);
-		response.close();
-	}
 	
 	/**
 	 * One-time finalisation method that destroys the Web service client.
@@ -59,7 +49,7 @@ public class LibraryWebServiceTest {
 	}
 	
 	/**
-	 * Tests that the Web service can create a new Book.
+	 * Tests that the Web service can create and query a new Book.
 	 * (This test is based off the given example in the dto-parolee project) 
 	 */
 	@Test
@@ -117,6 +107,24 @@ public class LibraryWebServiceTest {
 		assertEquals(book.getSubtitle(), book1.getSubtitle());
 	}
 	
+	/**
+	 * Tests that the Web service processes requests for all Books.
+	 * - query parameters
+	 * - HATEOAS
+	 */
+	@Test
+	public void queryAllBooks() {
+		List<Book> books = _client
+				.target(WEB_SERVICE_URI + "?start=1").request()
+				.accept("application/xml")
+				.get(new GenericType<List<Book>>() {});
+		if (books == null) {
+			fail("Failed to retrieve books");
+		} else {
+			// dummy data has 2 books, previous test added 1
+			assertEquals(3, books.size());
+		}
+	}
 	
 	/**
 	 * Tests that a web service can add and query loans for a book, includes
@@ -138,13 +146,23 @@ public class LibraryWebServiceTest {
 			fail("Failed to add a loan to book " + response.getStatus());
 		}
 		
-		// check that amy has book in her current books
-		
+		// check that amy has 2 books in her current books (one from dummy data)
+//		List<Book> books = _client
+//				.target(WEB_SERVICE_URI + "?mid=3").request()
+//				.accept("application/xml")
+//				.get(new GenericType<List<Book>>() {});
+//		if (books == null) {
+//			fail("Failed to retrieve books")
+//		} else {
+//			assertEquals(1, books.size()); // Change to 2 LATER----------------------------------<<<<<<<
+//		}
 	}
 	
-	// test checking availability and loan history of book
+	/**
+	 * Tests retrieving the loan history of a book 
+	 */
 	@Test
-	public void getAvailabilityandLoans() {
+	public void getLoans() {
 		
 	}
 	// test currently held books by member
