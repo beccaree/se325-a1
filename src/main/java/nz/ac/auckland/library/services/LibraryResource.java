@@ -331,6 +331,26 @@ public class LibraryResource {
 		}
 	}
 	
+	@GET
+	@Path("{id}/loan_history")
+	@Produces("application/xml")
+	public Response getLoans(@PathParam("id")long id) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		Book book = null;
+		try {
+			em.getTransaction().begin();
+			book = em.find(Book.class, id);
+			em.getTransaction().commit();
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+		GenericEntity<List<Loan>> entity = new GenericEntity<List<Loan>>(book.getLoanHistory()) {};
+		return Response.ok(entity).build();
+	}
+	
 //	EntityManager em = PersistenceManager.instance().createEntityManager();
 //	try {
 //		em.getTransaction().begin();
@@ -353,8 +373,9 @@ public class LibraryResource {
 			Book hp = new Book(0, "Harry Potter and the Deathly Hallows", "", new Author("J.K.", "Rowling"), BookGenre.FICTION, "", new Date(2007-1900, 7-1, 21));
 			Book sj = new Book(0, "Steve Jobs", "", new Author("Walter", "Isaacson"), BookGenre.BIOGRAPHY, "Simon & Shuster (U.S.)", new Date(2011-1900, 10-1, 24));
 			// create a member
-			Member amy = new Member(0, "amy", "wright");
+			Member amy = new Member(0, "Amy", "Wright");
 			// issue a book to a member
+			sj.addLoan(new Loan(amy, new Date(2012-1900, 11-1, 25), new Date(2012-1900, 12-1, 25)));
 			sj.addLoan(new Loan(amy, new Date(2014-1900, 10-1, 1), null));
 			sj.setAvailability(new Availability(false, amy));
 			amy.addToCurrentBooks(sj);

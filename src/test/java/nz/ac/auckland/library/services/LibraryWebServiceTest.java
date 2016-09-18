@@ -60,6 +60,7 @@ public class LibraryWebServiceTest {
 		Response response = _client
 				.target(WEB_SERVICE_URI).request()
 				.post(Entity.xml(hp));
+		_logger.debug("Response was " + response.getStatus());
 		if (response.getStatus() != 201) {
 			fail("Failed to add new book");
 		}
@@ -80,6 +81,7 @@ public class LibraryWebServiceTest {
 		assertEquals(hp.getGenre(), hpFromLibrary.getGenre());
 		assertEquals(hp.getPublisher(), hpFromLibrary.getPublisher()); // should be null
 		
+		// delete book
 		response = _client.target(location).request().delete();
 		if (response.getStatus() != 200) {
 			fail("Failed to delete book");
@@ -124,12 +126,8 @@ public class LibraryWebServiceTest {
 				.target(WEB_SERVICE_URI + "?start=1").request()
 				.accept("application/xml")
 				.get(new GenericType<List<Book>>() {});
-		if (books == null) {
-			fail("Failed to retrieve books");
-		} else {
-			// dummy data has 2 books
-			assertEquals(2, books.size());
-		}
+		// dummy data has 2 books
+		assertEquals(2, books.size());
 	}
 	
 	/**
@@ -165,15 +163,27 @@ public class LibraryWebServiceTest {
 	 */
 	@Test
 	public void getLoans() {
-		
+		List<Loan> history = _client
+				.target(WEB_SERVICE_URI + "/2/loan_history").request()
+				.accept("application/xml").get(new GenericType<List<Loan>>() {});
+ 
+		assertEquals(2, history.size());
+		assertEquals("Amy", history.get(0).getBorrower().getFirstname());
 	}
 	
 	/**
 	 * Test Requesting a book
 	 */
+	@Test
+	public void requestBook() {
+		
+	}
 	
 	/**
 	 * Test returning a book
 	 */
+	public void returnBook() {
+		
+	}
 	
 }
