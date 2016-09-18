@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -144,6 +146,30 @@ public class LibraryResource {
 	}
 	
 	/**
+	 * Delete a book from the database
+	 */
+	@DELETE
+	@Path("{id}")
+	public Response deleteBook(@PathParam("id")long id) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		try {
+			Book book = em.find(Book.class, id);
+			
+			em.getTransaction().begin();
+			em.remove(book);
+			em.getTransaction().commit();
+			
+			return Response.ok().build();
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+		return null;
+	}
+	
+	/**
 	 * Returns a List of nz.ac.auckland.library.dto.Book objects, according to the 
 	 * query parameters in the URI
 	 * 
@@ -172,12 +198,11 @@ public class LibraryResource {
 			
 			if (mid == 0) { // query all books
 				_logger.debug("Querying all books");
-				books = em.createQuery("select b from Book b", Book.class).getResultList();
+				books = em.createQuery("SELECT b FROM Book b", Book.class).getResultList();
 			} else { // query member's current books
 				_logger.debug("Querying books held by member id: " + mid);
-				String query = "SELECT * FROM BOOK b, MEMBER_BOOK m "
-						+ "WHERE m.member__id = 3 AND m._currentbooks__id = b._id";
-				books = em.createQuery(query, Book.class).getResultList();
+				Member member = em.find(Member.class, mid);
+				books = member.getCurrentlyHeldBooks();
 			}
 	
 			em.getTransaction().commit();
@@ -220,11 +245,43 @@ public class LibraryResource {
 	}
 	
 	/**
+	 * Add a new member to the database
+	 */
+	@POST
+	@Path("members")
+	@Consumes("application/xml")
+	public Response addMember(nz.ac.auckland.library.dto.Member dtoMember) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		
+		try {
+			em.getTransaction().begin();
+			
+			_logger.debug("Read Member: " + dtoMember);
+			Member member = MemberMapper.toDomainModel(dtoMember);
+			em.persist(member);
+			
+			em.getTransaction().commit();
+			_logger.debug("Created member: " + member);
+			
+			// Return a Response that specifies a status code of 201 Created along
+			// with the Location header set to URI of the newly created Book.
+			return Response.created(URI.create("/books/members/" + member.getId()))
+					.build();
+		} catch (Exception e) {
+		} finally {
+			if (em != null && em.isOpen()) {
+				em.close();
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Returns the member with unique identifier id
-	 * @param id
 	 */
 	@GET
 	@Path("members/{id}")
+	@Produces("application/xml")
 	public nz.ac.auckland.library.dto.Member getMember(@PathParam("id")long id) {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
 		try {
@@ -243,8 +300,12 @@ public class LibraryResource {
 		return null;
 	}
 	
+	/**
+	 * Issue a book identified by id to the member in the loan
+	 * - sets the availability of the book to false
+	 */
 	@POST
-	@Path("{id}/issue")
+	@Path("{id}/issue_book")
 	@Consumes("application/xml")
 	public void issueBookToMember(@PathParam("id")long id, Loan loan) {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
@@ -260,7 +321,6 @@ public class LibraryResource {
 			borrower.addToCurrentBooks(book);
 			
 			em.persist(book);
-			em.persist(loan);
 			em.persist(borrower);
 			em.getTransaction().commit();
 		} catch(Exception e) {

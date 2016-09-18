@@ -49,7 +49,7 @@ public class LibraryWebServiceTest {
 	}
 	
 	/**
-	 * Tests that the Web service can create and query a new Book.
+	 * Tests that the Web service can create, query and delete a Book.
 	 * (This test is based off the given example in the dto-parolee project) 
 	 */
 	@Test
@@ -61,7 +61,7 @@ public class LibraryWebServiceTest {
 				.target(WEB_SERVICE_URI).request()
 				.post(Entity.xml(hp));
 		if (response.getStatus() != 201) {
-			fail("Failed to add new Book");
+			fail("Failed to add new book");
 		}
 		
 		String location = response.getLocation().toString();
@@ -79,6 +79,12 @@ public class LibraryWebServiceTest {
 		assertEquals(hp.getDatePublished(), hpFromLibrary.getDatePublished());
 		assertEquals(hp.getGenre(), hpFromLibrary.getGenre());
 		assertEquals(hp.getPublisher(), hpFromLibrary.getPublisher()); // should be null
+		
+		response = _client.target(location).request().delete();
+		if (response.getStatus() != 200) {
+			fail("Failed to delete book");
+		}
+		response.close();
 	}
 	
 	/**
@@ -121,8 +127,8 @@ public class LibraryWebServiceTest {
 		if (books == null) {
 			fail("Failed to retrieve books");
 		} else {
-			// dummy data has 2 books, previous test added 1
-			assertEquals(3, books.size());
+			// dummy data has 2 books
+			assertEquals(2, books.size());
 		}
 	}
 	
@@ -140,22 +146,18 @@ public class LibraryWebServiceTest {
 		Loan loan = new Loan(MemberMapper.toDomainModel(amy), new Date(2016-1900, 9-1, 3), null);
 		// issue book with id=1 to Amy 
 		Response response = _client
-				.target(WEB_SERVICE_URI + "/1/issue").request()
+				.target(WEB_SERVICE_URI + "/1/issue_book").request()
 				.post(Entity.xml(loan));
 		if (response.getStatus() != 204) {
 			fail("Failed to add a loan to book " + response.getStatus());
 		}
 		
 		// check that amy has 2 books in her current books (one from dummy data)
-//		List<Book> books = _client
-//				.target(WEB_SERVICE_URI + "?mid=3").request()
-//				.accept("application/xml")
-//				.get(new GenericType<List<Book>>() {});
-//		if (books == null) {
-//			fail("Failed to retrieve books")
-//		} else {
-//			assertEquals(1, books.size()); // Change to 2 LATER----------------------------------<<<<<<<
-//		}
+		List<Book> books = _client
+				.target(WEB_SERVICE_URI + "?mid=3").request()
+				.accept("application/xml")
+				.get(new GenericType<List<Book>>() {});
+//		assertEquals(2, books.size());
 	}
 	
 	/**
@@ -165,8 +167,13 @@ public class LibraryWebServiceTest {
 	public void getLoans() {
 		
 	}
-	// test currently held books by member
 	
-	// test requesting a book
+	/**
+	 * Test Requesting a book
+	 */
+	
+	/**
+	 * Test returning a book
+	 */
 	
 }

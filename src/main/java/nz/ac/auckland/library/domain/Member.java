@@ -1,6 +1,8 @@
 package nz.ac.auckland.library.domain;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -30,8 +32,8 @@ public class Member extends Person {
 	private long _id;
 	
 	@XmlElement(name="current_books")
-	@OneToMany(fetch=FetchType.LAZY)
-	private Set<Book> _currentBooks = new HashSet<Book>();
+	@OneToMany(fetch=FetchType.EAGER)
+	private List<Book> _currentBooks = new ArrayList<Book>();
 
 	public Member(long id, String firstname, String lastname) {
 		super(firstname, lastname);
@@ -50,7 +52,7 @@ public class Member extends Person {
 		_id = id;
 	}
 	
-	public Set<Book> getCurrentlyHeldBooks() {
+	public List<Book> getCurrentlyHeldBooks() {
 		return _currentBooks;
 	}
 
