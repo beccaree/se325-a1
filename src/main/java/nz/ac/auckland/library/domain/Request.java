@@ -2,6 +2,7 @@ package nz.ac.auckland.library.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlElement;
 public class Request {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@XmlAttribute(name="id")
 	private Long _id;
 	

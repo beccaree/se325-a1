@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class to represent a Loan made by a Library member
@@ -19,6 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
  *
  */
 @Embeddable
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Loan {
 	
@@ -39,6 +41,8 @@ public class Loan {
 		_loanDate = start;
 		_returnDate = end;
 	}
+	
+	public Loan() {}
 
 	public Member getBorrower() {
 		return _borrower;

@@ -22,7 +22,16 @@ public class Availability {
 	@OneToOne(cascade=CascadeType.PERSIST)
 	private Member _holder;
 	
+	public Availability(boolean isAvailable, Member holder) {
+		_isAvailable = isAvailable;
+		_holder = holder;
+	}
+	
 	public Availability() {} // default is available, and no holder
+	
+	public boolean isAvailable() {
+		return _isAvailable;
+	}
 	
 	public void setAvailable(Boolean isAvailable) {
 		_isAvailable = isAvailable;

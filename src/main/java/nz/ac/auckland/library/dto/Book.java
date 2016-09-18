@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import nz.ac.auckland.library.domain.Author;
+import nz.ac.auckland.library.domain.Availability;
 import nz.ac.auckland.library.domain.BookGenre;
 
 /**
@@ -42,12 +43,6 @@ public class Book {
 	@XmlElement(name="date_published")
 	private Date _datePublished;
 	
-//	@XmlElement(name="availability")
-//	private Availability _availablility = new Availability();
-//	
-//	@XmlElement(name="loan_history")
-//	private List<Loan> _loanHistory = new ArrayList<Loan>();
-	
 	protected Book() {}
 	
 	public Book(String title, String subtitle, Author author, BookGenre genre, String publisher, Date datePublished) {
@@ -67,9 +62,17 @@ public class Book {
 	public long getId() {
 		return _id;
 	}
+	
+	public void setId(long id) {
+		_id = id;
+	}
 
 	public String getTitle() {
 		return _title;
+	}
+	
+	public void setTitle(String title) {
+		_title = title;
 	}
 
 	public String getSubtitle() {
@@ -111,21 +114,5 @@ public class Book {
 	public void setDatePublished(Date datePublished) {
 		_datePublished = datePublished;
 	}
-
-//	public Availability getAvailablility() {
-//		return _availablility;
-//	}
-//
-//	public void setAvailablility(Boolean isAvailable) {
-//		_availablility.setAvailable(isAvailable);
-//	}
-//
-//	public List<Loan> getLoanHistory() {
-//		return _loanHistory;
-//	}
-//
-//	public void addToLoanHistory(Loan loan) {
-//		_loanHistory.add(loan);
-//	}
 	
 }

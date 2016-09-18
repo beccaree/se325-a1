@@ -1,13 +1,23 @@
-package nz.ac.auckland.library.domain;
+package nz.ac.auckland.library.dto;
 
-import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@MappedSuperclass
+/**
+ * Class to represent a data tranfer object for a member
+ * For more info, see domain.Member class
+ * @author Rebecca (rlee291)
+ *
+ */
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Person {
+public class Member {
+
+	@XmlAttribute(name="member_id")
+	private long _id;
 
 	@XmlElement(name="first_name")
 	private String _firstname;
@@ -15,11 +25,20 @@ public class Person {
 	@XmlElement(name="last_name")
 	private String _lastname;
 	
-	public Person() {}
-	
-	public Person(String firstname, String lastname) {
+	public Member(long id, String firstname, String lastname) {
+		_id = id;
 		_firstname = firstname;
 		_lastname = lastname;
+	}
+	
+	protected Member() {}
+	
+	public long getId() {
+		return _id;
+	}
+	
+	public void setId(long id) {
+		_id = id;
 	}
 	
 	public String getFirstname() {

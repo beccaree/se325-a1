@@ -10,7 +10,8 @@ import nz.ac.auckland.library.domain.Book;
 public class BookMapper {
 
 	static Book toDomainModel(nz.ac.auckland.library.dto.Book dtoBook) {
-		Book domainBook = new Book(dtoBook.getId(),
+		Book domainBook = new Book(
+				dtoBook.getId(),
 				dtoBook.getTitle(),
 				dtoBook.getSubtitle(),
 				dtoBook.getAuthor(),

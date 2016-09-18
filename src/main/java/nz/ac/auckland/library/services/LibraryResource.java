@@ -1,17 +1,26 @@
 package nz.ac.auckland.library.services;
 
 import java.net.URI;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nz.ac.auckland.library.domain.Author;
+import nz.ac.auckland.library.domain.Availability;
 import nz.ac.auckland.library.domain.Book;
+import nz.ac.auckland.library.domain.BookGenre;
+import nz.ac.auckland.library.domain.Loan;
+import nz.ac.auckland.library.domain.Member;
 
 /**
  * Web service resource implementation for the Library application. An instance
@@ -24,22 +33,29 @@ import nz.ac.auckland.library.domain.Book;
 public class LibraryResource {
 	private static final Logger _logger = LoggerFactory.getLogger(LibraryResource.class);
 	
-	public LibraryResource() {}
-	
+	public LibraryResource() {
+		populateDatabase();
+	}
+
+	/**
+	 * Adds a new Book to the library system. The new book is described by a 
+	 * nz.ac.auckland.library.dto.Book object.
+	 * 
+	 * @param dtoBook - the Book details included in the HTTP request body.
+	 */
 	@POST
 	@Consumes("application/xml")
 	public Response addBook(nz.ac.auckland.library.dto.Book dtoBook) {
-		EntityManager entityManager = PersistenceManager.instance().createEntityManager();
-		_logger.debug("In @POST");
+		EntityManager em = PersistenceManager.instance().createEntityManager();
 		
 		try {
-			entityManager.getTransaction().begin();
+			em.getTransaction().begin();
 			
 			_logger.debug("Read book: " + dtoBook);
 			Book book = BookMapper.toDomainModel(dtoBook);
-			entityManager.persist(book);
+			em.persist(book);
 			
-			entityManager.getTransaction().commit();
+			em.getTransaction().commit();
 			_logger.debug("Created book: " + book);
 			
 			// Return a Response that specifies a status code of 201 Created along
@@ -47,30 +63,166 @@ public class LibraryResource {
 			return Response.created(URI.create("/books/" + book.getId()))
 					.build();
 		} catch (Exception e) {
-			
 		} finally {
-			if (entityManager != null && entityManager.isOpen()) {
-				entityManager.close();
+			if (em != null && em.isOpen()) {
+				em.close();
 			}
 		}
 		return null;
-		
 	}
 	
-//	@GET
-//	public MyEntity myServiceMethod( ) {
-//		EntityManager entityMgr = PersistenceManager.instance( ).createEntityManager( );         
-//		try {             
-//			entityMgr.getTransaction( ).begin( );
-//			// Do useful work.
-//			entityMgr.getTransaction( ).commit( );         
-//		} catch( Exception e ) {
-//			// Handle/propagate any exceptions.
-//	       	} finally {             
-//	       	if( entityMgr != null && entityMgr.isOpen( ) ) {                
-//	       		entityMgr.close( );             
-//	       	}         
-//	    }     
+	/**
+	 *  Returns a Book with a particular id. The returned Book is represented by a
+	 * nz.ac.auckland.library.dto.Book object.
+	 * 
+	 * @param id is the unique identifier of the Book.
+	 * 
+	 */
+	@GET
+	@Path("{id}")
+	public nz.ac.auckland.library.dto.Book getBook(@PathParam("id")long id) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			_logger.debug("Retrieving Book: id = " + id);
+			Book book = em.find(Book.class, id);
+			em.getTransaction().commit();
+			
+			return BookMapper.toDto(book);
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+		return null;
+	}
+	
+	/**
+	 * Updates the details of a book
+	 * @param id is the unique identifier of the book
+	 * @param dtoBook is representation of book containing the changes made
+	 */
+	@PUT
+	@Path("{id}")
+	@Consumes("application/xml")
+	public void updateBook(@PathParam("id")long id, nz.ac.auckland.library.dto.Book dtoBook) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			_logger.debug("Retrieving Book: id = " + id);
+			Book book = em.find(Book.class, id);
+			
+			// set new values
+			book.setAuthor(dtoBook.getAuthor());
+			book.setDatePublished(dtoBook.getDatePublished());
+			book.setGenre(dtoBook.getGenre());
+			book.setId(dtoBook.getId());
+			book.setPublisher(dtoBook.getPublisher());
+			book.setSubtitle(dtoBook.getSubtitle());
+			book.setTitle(dtoBook.getTitle());
+			
+			// persist changes to the database
+			em.persist(book);
+			em.getTransaction().commit();
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+	}
+	
+	/**
+	 * Returns the member with unique identifier id
+	 * @param id
+	 */
+	@GET
+	@Path("members/{id}")
+	public nz.ac.auckland.library.dto.Member getMember(@PathParam("id")long id) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			_logger.debug("Retrieving member: id = " + id);
+			Member member = em.find(Member.class, id);
+			
+			em.getTransaction().commit();
+			return MemberMapper.toDto(member);
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+		return null;
+	}
+	
+	@POST
+	@Path("{id}/issue")
+	@Consumes("application/xml")
+	public void issueBookToMember(@PathParam("id")long id, Loan loan) {
+		EntityManager em = PersistenceManager.instance().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			// add current loan to book without return date, and change book's availability
+			_logger.debug("Retrieving Book: id = " + id);
+			Book book = em.find(Book.class, id);
+			book.addLoan(loan);
+			book.setAvailability(new Availability(false, loan.getBorrower()));
+			// add book to user's current books
+			Member borrower = em.find(Member.class, loan.getBorrower().getId());
+			borrower.addToCurrentBooks(book);
+			
+			em.persist(book);
+			em.persist(loan);
+			em.persist(borrower);
+			em.getTransaction().commit();
+		} catch(Exception e) {
+		} finally {        
+			if(em != null && em.isOpen()){
+				em.close();
+	       	}
+		}
+	}
+	
+//	EntityManager em = PersistenceManager.instance().createEntityManager();
+//	try {
+//		em.getTransaction().begin();
+//		
+//
+//		em.getTransaction().commit();
+//	} catch(Exception e) {
+//	} finally {        
+//		if(em != null && em.isOpen()){
+//			em.close();
+//       	}
 //	}
+	
+	private void populateDatabase() {
+		EntityManager em = PersistenceManager.instance( ).createEntityManager( );
+		try {
+			em.getTransaction().begin();
+			
+			// create some books
+			Book hp = new Book(0, "Harry Potter and the Deathly Hallows", "", new Author("J.K.", "Rowling"), BookGenre.FICTION, "", new Date(2007-1900, 7-1, 21));
+			Book sj = new Book(0, "Steve Jobs", "", new Author("Walter", "Isaacson"), BookGenre.BIOGRAPHY, "Simon & Shuster (U.S.)", new Date(2011-1900, 10-1, 24));
+			// create a member
+			Member amy = new Member(0, "amy", "wright");
+			// issue Steve Jobs to Amy Wright
+			sj.addLoan(new Loan(amy, new Date(2014-1900, 10-1, 1), null));
+			sj.setAvailability(new Availability(false, amy));
+			amy.addToCurrentBooks(sj);
+			
+			em.persist(hp);
+			em.persist(sj);
+			em.persist(amy);
+			em.getTransaction( ).commit( );
+		} catch( Exception e ) {
+		} finally {        
+			if( em != null && em.isOpen( ) ) {
+				em.close( );
+	       	}
+		}	
+	}
 	
 }

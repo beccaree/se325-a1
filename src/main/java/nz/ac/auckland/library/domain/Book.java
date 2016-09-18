@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -34,7 +36,7 @@ import org.hibernate.annotations.Type;
 public class Book {
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long _id;
 	private String _title;
 	private String _subtitle;
@@ -66,9 +68,17 @@ public class Book {
 	public long getId() {
 		return _id;
 	}
+	
+	public void setId(long id) {
+		_id = id;
+	}
 
 	public String getTitle() {
 		return _title;
+	}
+	
+	public void setTitle(String title) {
+		_title = title;
 	}
 
 	public String getSubtitle() {
@@ -115,15 +125,15 @@ public class Book {
 		return _availablility;
 	}
 
-	public void setAvailablility(Boolean isAvailable) {
-		_availablility.setAvailable(isAvailable);
+	public void setAvailability(Availability availability) {
+		_availablility = availability;
 	}
 
 	public List<Loan> getLoanHistory() {
 		return _loanHistory;
 	}
 
-	public void addToLoanHistory(Loan loan) {
+	public void addLoan(Loan loan) {
 		_loanHistory.add(loan);
 	}
 
