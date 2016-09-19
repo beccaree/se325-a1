@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -18,7 +18,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Link;
@@ -322,22 +321,22 @@ public class LibraryResource {
 	@POST
 	@Path("{id}/issue_book")
 	@Consumes("application/xml")
-	public void issueBookToMember(@PathParam("id")long id, nz.ac.auckland.library.dto.Loan dtoLoan) {
+	public void issueBookToMember(@PathParam("id")long id, @CookieParam("userid")long userid,
+			nz.ac.auckland.library.dto.Loan dtoLoan) {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
 		try {
 			em.getTransaction().begin();
 			// add current loan to book without return date, and change book's availability
 			_logger.debug("Retrieving Book: id = " + id);
 			Book book = em.find(Book.class, id);
+			_logger.debug("Retrieving Member: id = " + userid);
+			Member member = em.find(Member.class, userid);
 			Loan loan = LibraryMapper.toDomainModel(dtoLoan);
+			loan.setBorrower(member);
 			book.addLoan(loan);
-			Member member = em.find(Member.class, loan.getBorrower());
 			book.setAvailability(new Availability(false, member));
-			// add book to user's current books
-			member.addToCurrentBooks(book);
-			
 			em.persist(book);
-			em.persist(member);
+			
 			em.getTransaction().commit();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -407,8 +406,8 @@ public class LibraryResource {
 			// create a member
 			Member amy = new Member(0, "Amy", "Wright");
 			// issue a book to a member
-			sj.addLoan(new Loan(amy.getId(), new Date(2012-1900, 11-1, 25), new Date(2012-1900, 12-1, 25)));
-			sj.addLoan(new Loan(amy.getId(), new Date(2014-1900, 10-1, 1), null));
+			sj.addLoan(new Loan(amy, new Date(2012-1900, 11-1, 25), new Date(2012-1900, 12-1, 25)));
+			sj.addLoan(new Loan(amy, new Date(2014-1900, 10-1, 1), null));
 			sj.setAvailability(new Availability(false, amy));
 			amy.addToCurrentBooks(sj);
 			

@@ -2,16 +2,11 @@ package nz.ac.auckland.library.domain;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlAccessType;
-
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Class to represent a Loan made by a Library member
@@ -22,7 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Embeddable
 public class Loan {
 
-	private long _borrowerId;
+	@OneToOne
+	@JoinColumn(name="member_id")
+	private Member _borrower;
 
 	@Temporal(TemporalType.DATE)
 	private Date _loanDate;
@@ -30,20 +27,20 @@ public class Loan {
 	@Temporal(TemporalType.DATE)
 	private Date _returnDate;
 	
-	public Loan(long borrower, Date start, Date end) {
-		_borrowerId = borrower;
+	public Loan(Member borrower, Date start, Date end) {
+		_borrower = borrower;
 		_loanDate = start;
 		_returnDate = end;
 	}
 	
 	public Loan() {}
 
-	public long getBorrower() {
-		return _borrowerId;
+	public Member getBorrower() {
+		return _borrower;
 	}
 
-	public void setBorrower(long borrower) {
-		_borrowerId = borrower;
+	public void setBorrower(Member borrower) {
+		_borrower = borrower;
 	}
 
 	public Date getLoanDate() {

@@ -18,8 +18,8 @@ import nz.ac.auckland.library.domain.Member;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Loan {
 
-	@XmlElement(name="borrower_id")
-	private long _borrowerId;
+	@XmlElement(name="borrower")
+	private Member _borrower;
 	
 	@XmlElement(name="loan_date")
 	private Date _loanDate;
@@ -27,20 +27,20 @@ public class Loan {
 	@XmlElement(name="return_date")
 	private Date _returnDate;
 	
-	public Loan(long borrower, Date start, Date end) {
-		_borrowerId = borrower;
+	public Loan(Member borrower, Date start, Date end) {
+		_borrower = borrower;
 		_loanDate = start;
 		_returnDate = end;
 	}
 	
 	public Loan() {}
 
-	public long getBorrower() {
-		return _borrowerId;
+	public Member getBorrower() {
+		return _borrower;
 	}
 
-	public void setBorrower(long borrower) {
-		_borrowerId = borrower;
+	public void setBorrower(Member borrower) {
+		_borrower = borrower;
 	}
 
 	public Date getLoanDate() {

@@ -1,9 +1,7 @@
 package nz.ac.auckland.library.domain;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinTable;
 import javax.persistence.OneToOne;
 import javax.xml.bind.annotation.XmlElement;
 
