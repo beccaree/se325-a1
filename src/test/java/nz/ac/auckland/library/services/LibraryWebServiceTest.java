@@ -69,7 +69,9 @@ public class LibraryWebServiceTest {
 		
 		// Query the Web service for the new Parolee
 		Book hpFromLibrary = _client.target(location).request()
-				.accept("application/xml").get(Book.class);
+				.accept("application/xml")
+				.get(Book.class);
+	
 		
 		// Check that the book returned is the same as the one added in the test
 		assertEquals(hp.getTitle(), hpFromLibrary.getTitle());
@@ -84,6 +86,20 @@ public class LibraryWebServiceTest {
 		response = _client.target(location).request().delete();
 		if (response.getStatus() != 200) {
 			fail("Failed to delete book");
+		}
+		response.close();
+	}
+	
+	/**
+	 * Test that when user queries for a book that does not exist, error is thrown
+	 */
+	@Test
+	public void notFoundBook() {
+		Response response = _client.target(WEB_SERVICE_URI + "/10").request()
+				.accept("application/xml")
+				.get();
+		if (response.getStatus() != 404) {
+			fail("Should have returned 404 Not Found");
 		}
 		response.close();
 	}

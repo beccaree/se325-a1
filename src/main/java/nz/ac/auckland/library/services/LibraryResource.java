@@ -11,6 +11,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -96,15 +97,18 @@ public class LibraryResource {
 	 */
 	@GET
 	@Path("{id}")
-	public nz.ac.auckland.library.dto.Book getBook(@PathParam("id")long id) {
+	public Response getBook(@PathParam("id")long id) {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
 		try {
 			em.getTransaction().begin();
 			_logger.debug("Retrieving Book: id = " + id);
 			Book book = em.find(Book.class, id);
+			if (book == null) {
+				return Response.status(404).build(); // not found
+			}
 			em.getTransaction().commit();
 			
-			return LibraryMapper.toDto(book);
+			return Response.ok(LibraryMapper.toDto(book)).build();
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {        
@@ -129,6 +133,9 @@ public class LibraryResource {
 			em.getTransaction().begin();
 			_logger.debug("Retrieving Book: id = " + id);
 			Book book = em.find(Book.class, id);
+			if (book == null) {
+				throw new NotFoundException("Book id = " + id + " does not exist"); // not found
+			}
 			
 			// set new values
 			book.setAuthor(dtoBook.getAuthor());
@@ -160,6 +167,9 @@ public class LibraryResource {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
 		try {
 			Book book = em.find(Book.class, id);
+			if (book == null) {
+				throw new NotFoundException("Book id = " + id + " does not exist");
+			}
 			
 			em.getTransaction().begin();
 			em.remove(book);
@@ -213,6 +223,9 @@ public class LibraryResource {
 				em.getTransaction().begin();
 				_logger.debug("Querying books held by member id: " + mid);
 				Member member = em.find(Member.class, mid);
+				if (member == null) {
+					throw new NotFoundException("Member id = " + mid + " does not exist");
+				}
 				books = member.getCurrentlyHeldBooks();
 				em.getTransaction().commit();
 			}
@@ -301,6 +314,9 @@ public class LibraryResource {
 			em.getTransaction().begin();
 			_logger.debug("Retrieving member: id = " + id);
 			Member member = em.find(Member.class, id);
+			if (member == null) {
+				throw new NotFoundException("Member id = " + id + " does not exist");
+			}
 			
 			em.getTransaction().commit();
 			return LibraryMapper.toDto(member);
@@ -329,8 +345,14 @@ public class LibraryResource {
 			// add current loan to book without return date, and change book's availability
 			_logger.debug("Retrieving Book: id = " + id);
 			Book book = em.find(Book.class, id);
+			if (book == null) {
+				throw new NotFoundException("Book id = " + id + " does not exist");
+			}
 			_logger.debug("Retrieving Member: id = " + userid);
 			Member member = em.find(Member.class, userid);
+			if (member == null) {
+				throw new NotFoundException("Member id = " + userid + " does not exist");
+			}
 			Loan loan = LibraryMapper.toDomainModel(dtoLoan);
 			loan.setBorrower(member);
 			book.addLoan(loan);
@@ -356,6 +378,9 @@ public class LibraryResource {
 		try {
 			em.getTransaction().begin();
 			book = em.find(Book.class, id);
+			if (book == null) {
+				throw new NotFoundException("Book id = " + id + " does not exist");
+			}
 			em.getTransaction().commit();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -379,20 +404,6 @@ public class LibraryResource {
 //			@QueryParam("mid")long mid, @Suspended AsyncResponse response) { // SUBSCRIBE
 //		// member mid subscribes to book bid
 //		response
-//	}
-	
-//	EntityManager em = PersistenceManager.instance().createEntityManager();
-//	try {
-//		em.getTransaction().begin();
-//		
-//
-//		em.getTransaction().commit();
-//	} catch(Exception e) {
-//		e.printStackTrace();
-//	} finally {        
-//		if(em != null && em.isOpen()){
-//			em.close();
-//       	}
 //	}
 	
 	private void populateDatabase() {
