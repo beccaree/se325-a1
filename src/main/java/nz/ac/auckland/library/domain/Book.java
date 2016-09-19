@@ -50,7 +50,7 @@ public class Book {
 	private Date _datePublished;
 	private Availability _availablility = new Availability();
 	
-	@ElementCollection(fetch = FetchType.EAGER)
+	@ElementCollection
 	private List<Loan> _loanHistory = new ArrayList<Loan>();
 	
 	public Book(long id, String title, String subtitle, Author author, BookGenre genre, String publisher, Date datePublished) {

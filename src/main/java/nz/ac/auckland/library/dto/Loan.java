@@ -1,33 +1,30 @@
-package nz.ac.auckland.library.domain;
+package nz.ac.auckland.library.dto;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Embeddable;
-import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
-
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import nz.ac.auckland.library.domain.Member;
+
 /**
- * Class to represent a Loan made by a Library member
- * 
+ * data transfer object representation of a loan made by a member
  * @author Rebecca Lee (rlee291)
  *
  */
-@Embeddable
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Loan {
 
+	@XmlElement(name="borrower_id")
 	private long _borrowerId;
-
-	@Temporal(TemporalType.DATE)
+	
+	@XmlElement(name="loan_date")
 	private Date _loanDate;
-
-	@Temporal(TemporalType.DATE)
+	
+	@XmlElement(name="return_date")
 	private Date _returnDate;
 	
 	public Loan(long borrower, Date start, Date end) {

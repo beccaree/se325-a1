@@ -17,6 +17,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Link;
@@ -45,6 +47,8 @@ import nz.ac.auckland.library.domain.Member;
 public class LibraryResource {
 	private static final Logger _logger = LoggerFactory.getLogger(LibraryResource.class);
 	
+	private List<AsyncResponse> responses = new ArrayList<AsyncResponse>();
+	
 	public LibraryResource() {
 		populateDatabase();
 	}
@@ -64,7 +68,7 @@ public class LibraryResource {
 			em.getTransaction().begin();
 			
 			_logger.debug("Read book: " + dtoBook);
-			Book book = BookMapper.toDomainModel(dtoBook);
+			Book book = LibraryMapper.toDomainModel(dtoBook);
 			em.persist(book);
 			
 			em.getTransaction().commit();
@@ -75,6 +79,7 @@ public class LibraryResource {
 			return Response.created(URI.create("/books/" + book.getId()))
 					.build();
 		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			if (em != null && em.isOpen()) {
 				em.close();
@@ -100,8 +105,9 @@ public class LibraryResource {
 			Book book = em.find(Book.class, id);
 			em.getTransaction().commit();
 			
-			return BookMapper.toDto(book);
+			return LibraryMapper.toDto(book);
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
@@ -138,6 +144,7 @@ public class LibraryResource {
 			em.persist(book);
 			em.getTransaction().commit();
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
@@ -161,6 +168,7 @@ public class LibraryResource {
 			
 			return Response.ok().build();
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
@@ -176,13 +184,15 @@ public class LibraryResource {
 	 */
 	@GET
 	@Produces("application/xml")
-	public Response getBooks(@DefaultValue("0") @QueryParam("mid")long mid, @DefaultValue("1") @QueryParam("start")int start, 
-			@DefaultValue("0") @QueryParam("size")int size, @Context UriInfo uriInfo) {
+	public Response getBooks(@DefaultValue("0") @QueryParam("mid")long mid, 
+			@DefaultValue("1") @QueryParam("start")int start, 
+			@DefaultValue("0") @QueryParam("size")int size, 
+			@Context UriInfo uriInfo) {
 		URI uri = uriInfo.getAbsolutePath();		
 		Link previous = null;
 		Link next = null;
 		
-		if(start > 1 && size != 0) { // if size is 0, retrieve everything
+		if(size != 0 && start > 1) { // if size is 0, retrieve everything
 			// there are previous Book - create a previous link
 			_logger.debug("Making PREV link");
 			previous = Link.fromUri(uri + "?mid={mid}start={start}&size={size}")
@@ -194,19 +204,22 @@ public class LibraryResource {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
 		List<Book> books = new ArrayList<Book>();
 		try {
-			em.getTransaction().begin();
 			
 			if (mid == 0) { // query all books
-				_logger.debug("Querying all books");
+				em.getTransaction().begin();
+				_logger.debug("Querying all books mid = " + mid + "start, size = " + start + "," + size);
 				books = em.createQuery("SELECT b FROM Book b", Book.class).getResultList();
+				em.getTransaction().commit();
 			} else { // query member's current books
+				em.getTransaction().begin();
 				_logger.debug("Querying books held by member id: " + mid);
 				Member member = em.find(Member.class, mid);
 				books = member.getCurrentlyHeldBooks();
+				em.getTransaction().commit();
 			}
 	
-			em.getTransaction().commit();
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
@@ -221,7 +234,7 @@ public class LibraryResource {
 			upperBound = start + size - 1;
 		}
 		for(int i = start-1; i < upperBound; i++) {
-			dtoBooks.add(BookMapper.toDto(books.get(i)));
+			dtoBooks.add(LibraryMapper.toDto(books.get(i)));
 		}
 		
 		if(size != 0 && start + size <= books.size()) { // there are successive books - create a next link
@@ -257,7 +270,7 @@ public class LibraryResource {
 			em.getTransaction().begin();
 			
 			_logger.debug("Read Member: " + dtoMember);
-			Member member = MemberMapper.toDomainModel(dtoMember);
+			Member member = LibraryMapper.toDomainModel(dtoMember);
 			em.persist(member);
 			
 			em.getTransaction().commit();
@@ -268,6 +281,7 @@ public class LibraryResource {
 			return Response.created(URI.create("/books/members/" + member.getId()))
 					.build();
 		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			if (em != null && em.isOpen()) {
 				em.close();
@@ -290,8 +304,9 @@ public class LibraryResource {
 			Member member = em.find(Member.class, id);
 			
 			em.getTransaction().commit();
-			return MemberMapper.toDto(member);
+			return LibraryMapper.toDto(member);
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
@@ -307,23 +322,25 @@ public class LibraryResource {
 	@POST
 	@Path("{id}/issue_book")
 	@Consumes("application/xml")
-	public void issueBookToMember(@PathParam("id")long id, Loan loan) {
+	public void issueBookToMember(@PathParam("id")long id, nz.ac.auckland.library.dto.Loan dtoLoan) {
 		EntityManager em = PersistenceManager.instance().createEntityManager();
 		try {
 			em.getTransaction().begin();
 			// add current loan to book without return date, and change book's availability
 			_logger.debug("Retrieving Book: id = " + id);
 			Book book = em.find(Book.class, id);
+			Loan loan = LibraryMapper.toDomainModel(dtoLoan);
 			book.addLoan(loan);
-			book.setAvailability(new Availability(false, loan.getBorrower()));
+			Member member = em.find(Member.class, loan.getBorrower());
+			book.setAvailability(new Availability(false, member));
 			// add book to user's current books
-			Member borrower = em.find(Member.class, loan.getBorrower().getId());
-			borrower.addToCurrentBooks(book);
+			member.addToCurrentBooks(book);
 			
 			em.persist(book);
-			em.persist(borrower);
+			em.persist(member);
 			em.getTransaction().commit();
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
@@ -342,14 +359,28 @@ public class LibraryResource {
 			book = em.find(Book.class, id);
 			em.getTransaction().commit();
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {        
 			if(em != null && em.isOpen()){
 				em.close();
 	       	}
 		}
-		GenericEntity<List<Loan>> entity = new GenericEntity<List<Loan>>(book.getLoanHistory()) {};
+		List<nz.ac.auckland.library.dto.Loan> dtoLoans = new ArrayList<nz.ac.auckland.library.dto.Loan>();
+		for (Loan loan : book.getLoanHistory()) {
+			dtoLoans.add(LibraryMapper.toDto(loan));
+		}
+		
+		GenericEntity<List<nz.ac.auckland.library.dto.Loan>> entity = new GenericEntity<List<nz.ac.auckland.library.dto.Loan>>(dtoLoans) {};
 		return Response.ok(entity).build();
 	}
+	
+//	@GET
+//	@Path("request")
+//	public void submitRequest(@QueryParam("bid")long bid,
+//			@QueryParam("mid")long mid, @Suspended AsyncResponse response) { // SUBSCRIBE
+//		// member mid subscribes to book bid
+//		response
+//	}
 	
 //	EntityManager em = PersistenceManager.instance().createEntityManager();
 //	try {
@@ -358,6 +389,7 @@ public class LibraryResource {
 //
 //		em.getTransaction().commit();
 //	} catch(Exception e) {
+//		e.printStackTrace();
 //	} finally {        
 //		if(em != null && em.isOpen()){
 //			em.close();
@@ -375,8 +407,8 @@ public class LibraryResource {
 			// create a member
 			Member amy = new Member(0, "Amy", "Wright");
 			// issue a book to a member
-			sj.addLoan(new Loan(amy, new Date(2012-1900, 11-1, 25), new Date(2012-1900, 12-1, 25)));
-			sj.addLoan(new Loan(amy, new Date(2014-1900, 10-1, 1), null));
+			sj.addLoan(new Loan(amy.getId(), new Date(2012-1900, 11-1, 25), new Date(2012-1900, 12-1, 25)));
+			sj.addLoan(new Loan(amy.getId(), new Date(2014-1900, 10-1, 1), null));
 			sj.setAvailability(new Availability(false, amy));
 			amy.addToCurrentBooks(sj);
 			
@@ -385,6 +417,7 @@ public class LibraryResource {
 			em.persist(amy);
 			em.getTransaction( ).commit( );
 		} catch( Exception e ) {
+			e.printStackTrace();
 		} finally {        
 			if( em != null && em.isOpen( ) ) {
 				em.close( );
